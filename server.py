@@ -18,6 +18,7 @@ display = "Auto Mailer"
 
 fwdheader = "Listserv Test"
 
+#replace with your own email
 address = "cattmompton@gmail.com"
 
 password = getfile("emailpass")
@@ -103,6 +104,7 @@ def handlemessage():
                 #mailer.send(forward)
 
         if discord != "OFF":
+            #replace with your own json object (discord webhook)
             r = requests.post(discord, data={"username":"Relay Doggo","avatar_url":"https://i.ytimg.com/vi/4PDQ1gziLL8/maxresdefault.jpg","content":send})
 
         f.close()
