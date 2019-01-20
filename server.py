@@ -1,9 +1,46 @@
 from flask import Flask
-from flask import request
+from flask import request,render_template,url_for
+from gmail import *
 
 import os
 
+def getfile(name):
+    f = open(name)
+    t = f.read()
+    f.close()
+    return t
+
 app = Flask(__name__)
+
+display = "Auto Mailer"
+
+fwdheader = "Listserv Test"
+
+address = "cattmompton@gmail.com"
+
+password = getfile("emailpass")
+
+fromad = display + "<" + address + ">"
+mailer = GMail(fromad,password)
+
+def addemail(email):
+    if os.path.exists("emails.txt"):
+        f = open("emails.txt","a+")
+        f.write("\n"+email)
+        f.close()
+
+def getemails():
+    if os.path.exists("emails.txt"):
+        f = open("emails.txt")
+        t = f.read()
+        f.close()
+        return t
+
+def mer(name):
+    f = open("templates\\"+name)
+    t = f.read()
+    f.close()
+    return t
 
 def mid():
     if not os.path.exists("c"):
@@ -26,6 +63,22 @@ def getc():
     f.close()
     return c
 
+def latest():
+    f = open("msg")
+    t = f.read()
+    f.close()
+    return t
+
+@app.route("/", methods=["GET","POST"])
+def index():
+    if request.method == "POST":
+        address = request.form.get("email")
+        addemail(address)
+        return render_template('notification.html', type="success", text="Added " + address + " to the list")
+
+    return render_template('index.html', message=str(latest()))
+
+
 @app.route("/message/")
 def handlemessage():
     send = request.args.get("t")
@@ -42,6 +95,13 @@ def handlemessage():
             os.remove("msg")
         f = open("msg","w")
         f.write(send)
+
+        emails = str(getemails()).split("\n")
+        for email in emails:
+            if email != "\n":
+                forward = Message(fwdheader,to=email,text=send)
+                mailer.send(forward)
+
         f.close()
         mid()
         return str(getc()) + ": Sent " + send
@@ -50,5 +110,4 @@ def handlemessage():
 def returnboi():
     return getc()
 
-
-app.run(host='0.0.0.0',port=6969)
+app.run(host='0.0.0.0',port=6969,debug=True)
