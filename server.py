@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request,render_template,url_for
 from gmail import *
+import requests
 
 import os
 
@@ -19,6 +20,9 @@ fwdheader = "Listserv Test"
 address = "cattmompton@gmail.com"
 
 password = getfile("emailpass")
+
+# If file says off, then no webhook
+discord = getfile("discord")
 
 fromad = display + "<" + address + ">"
 mailer = GMail(fromad,password)
@@ -95,12 +99,15 @@ def handlemessage():
             os.remove("msg")
         f = open("msg","w")
         f.write(send)
-
+        # Email list
         emails = str(getemails()).split("\n")
         for email in emails:
             if email != "\n":
-                forward = Message(fwdheader,to=email,text=send)
+                forward = Message(fwdheader,to=email,text="Forward: " + send)
                 mailer.send(forward)
+
+        if discord != "OFF":
+            r = requests.post(discord, data={"username":"Relay Doggo","avatar_url":"https://i.ytimg.com/vi/4PDQ1gziLL8/maxresdefault.jpg","content":send})
 
         f.close()
         mid()
