@@ -4,6 +4,7 @@ emailpass
 c
 msg
 discord
+*.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
