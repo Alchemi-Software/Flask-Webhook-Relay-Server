@@ -22,7 +22,7 @@ address = "cattmompton@gmail.com"
 
 password = getfile("emailpass")
 
-# If file says off, then no webhook
+# If = "OFF", then no webhook
 discord = getfile("discord")
 
 fromad = display + "<" + address + ">"
