@@ -12,6 +12,7 @@ def getfile(name):
     return t
 
 app = Flask(__name__)
+app.config['TRAP_HTTP_EXCEPTIONS']=True
 
 display = "Auto Mailer"
 
@@ -40,11 +41,6 @@ def getemails():
         f.close()
         return t
 
-def mer(name):
-    f = open("templates\\"+name)
-    t = f.read()
-    f.close()
-    return t
 
 def mid():
     if not os.path.exists("c"):
@@ -100,11 +96,11 @@ def handlemessage():
         f = open("msg","w")
         f.write(send)
         # Email list
-        emails = str(getemails()).split("\n")
-        for email in emails:
-            if email != "\n":
-                forward = Message(fwdheader,to=email,text="Forward: " + send)
-                mailer.send(forward)
+        #emails = str(getemails()).split("\n")
+        #for email in emails:
+            #if email != "\n":
+                #forward = Message(fwdheader,to=email,text="Forward: " + send)
+                #mailer.send(forward)
 
         if discord != "OFF":
             r = requests.post(discord, data={"username":"Relay Doggo","avatar_url":"https://i.ytimg.com/vi/4PDQ1gziLL8/maxresdefault.jpg","content":send})
@@ -112,6 +108,12 @@ def handlemessage():
         f.close()
         mid()
         return str(getc()) + ": Sent " + send
+
+
+
+@app.errorhandler(Exception)
+def http_error_handler(e):
+    return render_template("notification.html",type="danger",text=str(e))
 
 @app.route("/latest/")
 def returnboi():
